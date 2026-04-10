@@ -13,6 +13,9 @@ jobs:
       MACHINE_NAME: gh-runner-24227352594
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Install Tailscale
         run: |
           curl -fsSL https://tailscale.com/install.sh | sh
@@ -28,6 +31,7 @@ jobs:
       - name: Find node ID
         run: |
           python3 find_node.py
+          cat node.txt
 
       - name: Share machine
         run: |
