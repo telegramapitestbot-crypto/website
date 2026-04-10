@@ -24,36 +24,18 @@ jobs:
       - name: Get machine list
         run: |
           tailscale status --json > status.json
-          cat status.json
 
-      - name: Find node and share
+      - name: Find node ID
         run: |
-          NODE_ID=$(python3 - << 'EOF'
-import json
+          python3 find_node.py
 
-with open("status.json") as f:
-    data = json.load(f)
-
-machine = "gh-runner-24227352594"
-
-node_id = ""
-
-for peer in data.get("Peer", {}).values():
-    if peer.get("HostName") == machine:
-        node_id = peer.get("ID")
-
-print(node_id)
-EOF
-)
+      - name: Share machine
+        run: |
+          NODE_ID=$(cat node.txt)
 
           if [ -z "$NODE_ID" ]; then
             echo "❌ Machine not found"
             exit 1
           fi
 
-          echo "Found node: $NODE_ID"
-
-          tailscale share $NODE_ID user@example.com
-
-      - name: Done
-        run: echo "Shared successfully 🎉"
+          tailscale share "$NODE_ID" "$SHARE_EMAIL"
